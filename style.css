@@ -1,0 +1,51 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #1c1b1b;
+  color: #fff;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.titulo{
+	text-align: center;
+}
+.Ingredient-display{
+	display: flex;
+}
+
+.Ingredient-box{
+	border: 1px solid #a6e9e3;
+	margin: 1em;
+	padding: 3%;
+	
+}
+
+
+.ytb-video{
+	display: grid;
+	align-items: center;
+	justify-content:center;
+	padding: 10% 0;
+}
+
+footer {
+  text-align: center;
+  padding-top:10%;
+  padding: 5px;
+  background-color: #1c1b1b;
+  color: #fff;
+}
