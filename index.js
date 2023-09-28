@@ -27,6 +27,8 @@ function InfoBox() {
 
   info_box1.textContent = day + "/" + month + "/" + year;
   info_box2.textContent = getAmPm;
+  console.log("Chegou Info_box");
 }
+
 setInterval(ClockRotating, 1000);
 setInterval(InfoBox, 1000);
