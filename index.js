@@ -14,6 +14,7 @@ function ClockRotating() {
   secondHand.style.transform = "rotate(" + getSeconds * -360 + "deg)";
   minuteHand.style.transform = "rotate(" + getMinutes * -360 + "deg)";
   hourHand.style.transform = "rotate(" + getHours * -360 + "deg)";
+  console.log("chegou clock");
 }
 
 function InfoBox() {

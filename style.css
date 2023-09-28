@@ -37,6 +37,7 @@ body {
   justify-content:center;
   align-items:center;
 }
+
 #clock-box{
   width:350px;
   height: 350px;
@@ -70,16 +71,6 @@ body {
 .info-box-text{
   padding: 25px;
 }
-/* .clock-am-pm{ */
-/*   left:36%; */
-/*   position:relative; */
-/*   background: transparent; */
-/*   height: 460px; */
-/*   width: 460px; */
-/*   border: 20px solid; */
-/*   border-radius: 50%; */
-/*   border-color: green  red ; */
-/* } */
 
 
 .clock-number{
