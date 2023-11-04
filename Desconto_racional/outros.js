@@ -1,6 +1,6 @@
 // pmt = pagamento mensal
 //  @param np n ´u mero de presta ¸c ~o es .
-//  @param pv valor do empr ´e stimo .
+// /  @param pv valor do empr ´e stimo .
 //  @param t taxa de juros .
 //  @param pmt pagamento mensal .
 //  @return uma matriz cujas linhas s ~a o listas com :
@@ -26,7 +26,13 @@ function priceTable(np, pv, t, pmt) {
       saldo: saldo.toFixed(2),
     });
   }
-  end.push({name:"Total", pt:pt, jt:jt, at:at, saldo:0});
+  table.push({
+    numero: "Total",
+    pmt: pt.toFixed(2),
+    juros: jt.toFixed(2),
+    amortizacao: at.toFixed(2),
+    saldo: 0,
+  });
   return table;
 }
 
@@ -34,20 +40,20 @@ function priceTable(np, pv, t, pmt) {
 // @param p: parcelas
 // @param t: taxa
 function CF(p, t) {
-  return t / (1 - 1/((1 + t) ** p));
+  return t / (1 - 1 / (1 + t) ** p);
 }
-function PMT(pv,cf){
-  return pv * cf
+function PMT(pv, cf) {
+  return pv * cf;
 }
 var table = [];
 var total = [];
 var data_exemple = [
   {
-    numero: 0.,
-    pmt: 0.,
-    juros: 0.,
-    amortizacao: 0.,
-    saldo: 0.,
+    numero: 0,
+    pmt: 0,
+    juros: 0,
+    amortizacao: 0,
+    saldo: 0,
   },
 ];
 $(document).ready(function () {
@@ -61,8 +67,108 @@ $(document).ready(function () {
       { data: "saldo", title: "Saldo" },
     ],
   });
-  // $("#price-table-form").hide();
+  $("#pricefieldset").hide();
+  $("#newtonfildset").hide();
+  $("#consumidorfieldset").hide();
 });
+
+//making dragabble
+$(function () {
+  $(".draggable").draggable();
+});
+
+webshims.setOptions("forms-ext", {
+  replaceUI: "auto",
+  types: "number",
+});
+webshims.polyfill("forms forms-ext");
+
+function getINterest() {
+  let t1 = x / y;
+  let t = 0;
+  let n = 0;
+}
+
+function calcTaxaJuros(precoAVista, precoAPrazo, numParcelas, temEntrada) {
+  const tolerancia = 0.0001;
+  let taxaJuros = 0.1; // palpite inicial
+  let taxaJurosAnterior = 0.0;
+  let funcao = 0.0;
+  let derivada = 0.0;
+  for (let i = 0; Math.abs(taxaJurosAnterior - taxaJuros) >= tolerancia; i++) {
+    taxaJurosAnterior = taxaJuros;
+    funcao = calcularValorFuncao(
+      precoAPrazo,
+      taxaJuros,
+      precoAVista,
+      numParcelas,
+      temEntrada,
+    );
+    console.log("funcao", funcao);
+    derivada = calcularValorDerivadaFuncao(
+      precoAPrazo,
+      taxaJuros,
+      precoAVista,
+      numParcelas,
+      temEntrada,
+    );
+
+    console.log("derivada", derivada);
+    if (derivada == 0) {
+      return 0;
+    }
+    if (taxaJuros <= 0.0001) {
+      return (taxaJuros = 0);
+    }
+    taxaJuros = taxaJuros - funcao / derivada;
+  }
+  return taxaJuros;
+}
+
+function calcularValorFuncao(
+  preceAprazo,
+  taxaJuros,
+  precoVista,
+  numParcelas,
+  temEntrada,
+) {
+  let a = 0;
+  let b = 0;
+  let c = 0;
+  if (temEntrada) {
+    a = Math.pow(1 + taxaJuros, numParcelas - 2);
+    b = Math.pow(1 + taxaJuros, numParcelas - 1);
+    c = Math.pow(1 + taxaJuros, numParcelas);
+    precoVista * taxaJuros * b - (preceAprazo / numParcelas) * (c - 1);
+    return precoVista * taxaJuros * b - (preceAprazo / numParcelas) * (c - 1);
+  } else {
+    a = Math.pow(1 + taxaJuros, -numParcelas);
+    b = Math.pow(1 + taxaJuros, -numParcelas - 1);
+    return precoVista * taxaJuros - (preceAprazo / numParcelas) * (1 - a);
+  }
+}
+
+function calcularValorDerivadaFuncao(
+  preceAprazo,
+  taxaJuros,
+  precoAVista,
+  temEntrada,
+  numParcelas,
+) {
+  let a = 0;
+  let b = 0;
+  if (temEntrada) {
+    a = Math.pow(1 + taxaJuros, numParcelas - 2);
+    b = Math.pow(1 + taxaJuros, numParcelas - 1);
+    return (
+      precoAVista * (b + taxaJuros * a * (numParcelas - 1)) - preceAprazo * b
+    );
+  } else {
+    a = Math.pow(1 + taxaJuros, -numParcelas);
+    b = Math.pow(1 + taxaJuros, -numParcelas - 1);
+    return precoAVista - preceAprazo * b;
+  }
+}
 
 $("#submitButton").click(function () {
   var errorMessage = "";
@@ -71,11 +177,15 @@ $("#submitButton").click(function () {
   let ipv = $("#ipv").val();
   let np = $("#parc").val();
   let pb = $("#ipb").val();
+  let volta = $("#volta").val();
+  let idp = $("#idp").val();
   console.log("ipp:", ipp);
   console.log("itax:", itax);
   console.log("ipv:", ipv);
   console.log("np:", np);
   console.log("pb:", pb);
+  console.log("volta:", volta);
+  console.log("idp:", idp);
   console.log("Entrou dentro do click");
   if (itax == 0 && ipp == 0) {
     errorMessage +=
@@ -97,30 +207,33 @@ $("#submitButton").click(function () {
   } else {
     $("#successMessage").show();
     $("#errorMessage").hide();
-    pmt = PMT(ipv,CF(np,itax))
+    cf = CF(np, itax);
+    pmt = PMT(ipv, cf);
     table = priceTable(np, ipv, itax, pmt);
+    end = table.splice(table.length - 1, table.length);
     console.log(table);
     $("#price-table").DataTable().clear().draw();
     console.log("limpou");
     $("#price-table").DataTable().rows.add(table).draw();
-    // $("#price-table-form").show();
-    // $("#cdcfieldset").hide();
+    console.log(end);
+    $("#cdcfieldset").hide();
+    $("#pricefieldset").show();
+    $("#newtonfildset").show();
+    $("#total-prestacao").html(end[0].pmt);
+    $("#total-juros").html(end[0].juros);
+    $("#total-amortizacao").html(end[0].amortizacao);
+    $("#total-saldo").html(end[0].saldo);
+    $("#newton-cf").html(cf);
+    $("#newton-prestacao").html(`${ipv}*$${cf} = ${pmt.toFixed(2)}`);
+    $("#newton-valorPago").html(end[0].pmt);
+    // calcular taxa Real
+    // precoAVista,
+    // precoAPrazo,
+    // numParcelas,
+    // temEntrada,
+    taxaReal = calcTaxaJuros(ipp, pmt, np, idp);
+    console.log("taxaReal:", taxaReal);
+    $("#newton-taxaReal").html(taxaReal);
+    $("#newton-valorCorrigido").html();
   }
 });
-
-//making dragabble
-$(function () {
-  $(".draggable").draggable();
-});
-
-webshims.setOptions("forms-ext", {
-  replaceUI: "auto",
-  types: "number",
-});
-webshims.polyfill("forms forms-ext");
-
-function getINterest() {
-  let t1 = x / y;
-  let t = 0;
-  let n = 0;
-}
